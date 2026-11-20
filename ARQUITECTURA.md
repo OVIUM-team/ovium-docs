@@ -154,14 +154,14 @@ sequenceDiagram
 - **Servidores en la nube:** contenedores Linux.
 - **Usuarios del portal:** cualquier navegador moderno en cualquier sistema operativo.
 
-## 9. Nube (AWS) — por confirmar
+## 9. Nube (AWS)
 
 Estado: cuenta abierta con plan gratuito, con **100 USD de créditos** y 182 días de vigencia. Región elegida: **us-east-2 (Ohio)**. Todo se despliega en la misma región.
 
 | Parte | Servicio propuesto | Estado |
 |---|---|---|
-| Base de datos | Amazon RDS para SQL Server Express | Por confirmar (el plan gratuito podría limitarlo) |
-| API | EC2 con Docker o ECS | Por decidir |
+| Base de datos | Amazon RDS para SQL Server Express (instancia `ovium-db`, SQL Server 2019, `db.t3.micro`, 20 GiB, sin acceso público) | Creada el 19 de noviembre de 2026 |
+| API | EC2 con Docker (el mismo Docker Compose del entorno local) | Decidido el 19 de noviembre de 2026 |
 | Portal web | S3 con CloudFront | Por confirmar |
 | Fotos | S3 | Por confirmar |
 | Acceso del equipo | AWS Team o usuarios IAM | En proceso |
@@ -170,11 +170,13 @@ Estado: cuenta abierta con plan gratuito, con **100 USD de créditos** y 182 dí
 flowchart LR
     U["Usuarios"] -- "HTTPS" --> CF["CloudFront"]
     CF --> S3W[("S3: portal web")]
-    A["App Android"] -- "HTTPS" --> API["API FastAPI<br/>EC2 con Docker o ECS"]
+    A["App Android"] -- "HTTPS" --> API["API FastAPI<br/>EC2 con Docker"]
     U -. "HTTPS: llamadas del portal" .-> API
     API --> RDS[("RDS SQL Server Express")]
     API --> S3F[("S3: fotos")]
 ```
+
+La instancia de RDS cuesta unos 0.025 USD por hora (unos 18 USD al mes si queda encendida) y sale de los créditos. No tiene acceso público: solo la API, cuando corra en EC2, podrá conectarse. El SQL Server local de Docker es 2022 y el de RDS es 2019, así que el código no debe usar funciones exclusivas de 2022.
 
 Los secretos (contraseña de la base, llave del JWT) se configuran en el servicio donde corre la API. **Nunca van en el código ni en la imagen de Docker.**
 
@@ -197,5 +199,3 @@ Corrales y cuarentena, dietas, indicadores económicos, código QR por animal, m
 - Regla de conflictos al sincronizar sin conexión (confirmar con el MVZ Álvaro).
 - Alcance del árbol genealógico: 4 ancestros o 4 generaciones.
 - Si el indicador de utilidad incluye costos.
-- Si el plan gratuito de AWS permite RDS con SQL Server, o si hace falta otra opción.
-- EC2 con Docker o ECS para la API.
